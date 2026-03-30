@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinTrack - Instructor</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="instructor.css">
+</head>
+<body>
+<script>
+(function() {
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) {
+    window.location.href = 'login.html';
+    return;
+  }
+  const user = JSON.parse(currentUser);
+  if (user.role !== 'instructor') {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+  }
+})();
+</script>
+<header>
+<div>
+  <h2>🏥 ClinTrack</h2>
+</div>
+<div>
+  <strong>👤 Instructor:</strong> <span id="instructorName">Loading...</span>
+  <button onclick="logout()" class="logout">Logout</button>
+</div>
+</header>
+<div class="container">
+<div class="sidebar">
+<button onclick="showSection('dashboard', event)">📊 Dashboard</button>
+<button onclick="showSection('manageSchedule', event)">🗓️ Manage Schedules</button>
+<button onclick="showSection('receivedLab', event)">📥 Lab Tests</button>
+<button onclick="showSection('dutyRequirement', event)">📁 Duty Requirements</button>
+<button onclick="showSection('forum', event)">💬 Forum / Announcement</button>
+</div>
+<div class="main">
+<div id="dashboard" class="section">
+<div class="card">
+<h3>👋 Welcome Clinical Instructor</h3>
+<p>This portal allows you to manage clinical duty schedules, receive return demos from students, and track lab tests.</p>
+</div>
+<div class="card">
+<h3>📊 Dashboard Metrics</h3>
+<div class="cards-grid">
+  <div class="metric-card">
+    <div class="metric-label">Students (Schedules)</div>
+    <div id="scheduleStudentCount" class="metric-value green">0</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Pending Lab Tests</div>
+    <div id="pendingLabCount" class="metric-value orange">0</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Reviewed Lab Tests</div>
+    <div id="reviewedLabCount" class="metric-value green">0</div>
+  </div>
+</div>
+</div>
+</div>
+<div id="manageSchedule" class="section hidden">
+<div class="card">
+<h3>🗓️ Manage Clinical Duty Schedules</h3>
+<p>Assign students to clinical shifts and keep their schedule records up to date.</p>
+<div class="task-panel">
+  <strong>➕ Add Schedule</strong>
+  <div class="cards-grid compact">
+    <input id="scheduleStudentName" placeholder="Student Name" />
+    <input id="scheduleStudentId" placeholder="Student ID" />
+    <input id="scheduleDate" placeholder="Date (Month/Day)" />
+    <input id="scheduleHospital" placeholder="Hospital / Unit" />
+    <input id="scheduleWard" placeholder="Ward/Department" />
+    <input id="scheduleShift" placeholder="Shift (Morning/Afternoon/Night)" />
+  </div>
+  <button class="primary" id="addScheduleBtn">Save Schedule</button>
+</div>
+<div class="section-margin-top">
+  <h4 class="section-heading">🗂️ Current Schedules</h4>
+  <div class="responsive-table"><table><thead><tr><th>Date</th><th>Student</th><th>Hospital</th><th>Ward</th><th>Shift</th><th>Action</th></tr></thead><tbody id="scheduleTableBody"></tbody></table></div>
+</div>
+</div>
+</div>
+<div id="receivedLab" class="section hidden">
+<div class="card">
+<h3>📥 Received Lab Tests</h3>
+<p class="section-notice">Review student-submitted lab results and mark their status. Use the table actions to update or remove entries.</p>
+<div class="responsive-table">
+  <table class="instructor-table">
+    <thead>
+      <tr>
+        <th class="col-student">Student</th>
+        <th class="col-lab">Lab Test</th>
+        <th class="col-date">Date</th>
+        <th class="col-result">Result</th>
+        <th class="col-notes">Notes</th>
+        <th class="col-action">Action</th>
+      </tr>
+    </thead>
+    <tbody id="labTableBody"></tbody>
+  </table>
+</div>
+</div>
+</div>
+<div id="dutyRequirement" class="section hidden">
+<div class="card">
+<h3>📁 Duty Requirement Submissions</h3>
+<p class="section-notice">Review files submitted by students under duty requirements. Mark as reviewed, download, or manage records.</p>
+<div id="instructorDutyFolders">
+  <p class="loading-placeholder">Loading submitted duty files...</p>
+</div>
+</div>
+</div>
+<div id="forum" class="section hidden">
+<div class="card">
+<h3>💬 Announcements & Forum</h3>
+<p class="section-notice">💡 Post announcements and participate in forum discussions with students.</p>
+<h4 class="section-heading">📢 Announcements</h4>
+<div id="announcementsContainer">
+<p class="no-announcements">No announcements yet. Post updates for students.</p>
+</div>
+<h4 class="section-heading">💬 Forum Discussions</h4>
+<textarea id="forumInput" placeholder="Start a discussion..."></textarea>
+<button class="primary" onclick="addForumPost()">💬 Post Discussion</button>
+<div id="forumPosts"></div>
+</div>
+</div>
+</div>
+</div>
+<script type="module" src="firebase.js"></script>
+<script type="module" src="instructor-script.js"></script>
+</body>
+</html>

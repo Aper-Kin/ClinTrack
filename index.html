@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinTrack</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="favicon.ico">
+</head>
+<body>
+
+<script>
+// Check authentication
+(function() {
+  const currentUser = localStorage.getItem('currentUser');  
+  if (!currentUser) {
+    window.location.href = 'login.html';
+    return;
+  }
+  const user = JSON.parse(currentUser);
+  if (user.role !== 'student' && user.role !== 'instructor') {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+  }
+})();
+</script>
+
+<header>
+<div>
+  <h2>🏥 ClinTrack Portal</h2>
+</div>
+<div id="userHeader">
+  <span id="roleLabel">👤 User:</span> <span id="userName">Loading...</span>
+  <button onclick="logout()" style="margin-left: 20px; padding: 5px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Logout</button>
+</div>
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="showSection('dashboard')">📊 Dashboard</button>
+<button id="scheduleBtn" onclick="showSection('schedule')">📅 Clinical Duty Schedule</button>
+<button id="labBtn" onclick="showSection('lab')">🧪 Laboratory Test</button>
+<button id="dutyReqBtn" onclick="showSection('dutyRequirement')">📁 Duty Requirement</button>
+<button onclick="showSection('forum')">💬 Forum / Announcement</button>
+</div>
+
+<div class="main">
+
+<div id="dashboard" class="section">
+<div class="card">
+<h3>👋 Welcome to ClinTrack</h3>
+<p>This portal is your comprehensive hub for managing your clinical training. Here you'll find your clinical duty schedule, submit your laboratory tests, upload duty requirements, and stay updated with important announcements from your Clinical Instructor.</p>
+</div>
+<div class="card">
+<h3>📌 Quick Stats</h3>
+<p style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+  <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #e8f4f8, #c3cfe2); border-radius: 8px;">
+    <div style="font-size: 24px; font-weight: bold; color: #0066cc;" id="scheduleCount">0</div>
+    <div style="font-size: 12px; color: #2c3e50; margin-top: 5px;">Duty Schedules</div>
+  </div>
+  <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 8px;">
+    <div style="font-size: 24px; font-weight: bold; color: #059669;" id="labCount">0</div>
+    <div style="font-size: 12px; color: #2c3e50; margin-top: 5px;">Lab Tests</div>
+  </div>
+</p>
+</div>
+</div>
+
+<div id="schedule" class="section hidden">
+<div class="card">
+<h3>📅 My Clinical Duty Schedule</h3>
+<table>
+<tr>
+<th>Date</th>
+<th>Hospital</th>
+<th>Ward</th>
+<th>Shift</th>
+<th>Clinical Instructor</th>  
+</tr>
+<tbody id="scheduleBody">
+<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No scheduled duties yet. Check back later!</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="lab" class="section hidden">
+<div class="card">
+<h3>🧪 My Laboratory Requirements</h3>
+<div class="student-lab-form">
+  <strong>Submit a Lab Test</strong>
+  <div class="student-lab-grid">
+    <div class="field">
+      <label for="studentLabTestName"></label>
+      <input id="studentLabTestName" placeholder="Test/Requirement" />
+    </div>
+    <div class="field">
+      <label for="studentLabResult"></label>
+      <input id="studentLabResult" placeholder="Result" />
+    </div>
+    <div class="field">
+      <label for="studentLabDate"></label>
+      <input id="studentLabDate" type="date" />
+    </div>
+    <div class="field">
+      <label for="studentLabInstructor"></label>
+      <select id="studentLabInstructor"><option value=""></option></select>
+    </div>
+    <div class="field field-wide">
+      <label for="studentLabNotes"></label>
+      <textarea id="studentLabNotes" placeholder="Notes for instructor"></textarea>
+    </div>
+  </div>
+  <button class="primary" id="submitLabBtn" style="margin-top: 12px;">Submit Lab Result</button>
+</div>
+<table>
+<tr>
+<th>Test/Requirement</th>
+<th>Date Completed</th>
+<th>Result</th>
+<th>Instructor</th>
+<th>Notes</th>
+</tr>
+<tbody id="labBody">
+<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">No lab tests recorded yet.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="dutyRequirement" class="section hidden">
+<div class="card">
+<h3>📁 Duty Requirement Management</h3>
+
+<!-- STUDENT VIEW -->
+<div id="studentDutyView" class="duty-view">
+<div style="background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid #0066cc; margin-bottom: 16px;">
+  <p style="font-size: 13px; color: #0066cc; margin: 0;">📤 Submit link for: Learning Feedback Diary, Drug Study, or Nursing Care Plan</p>
+</div>
+
+<div style="margin-bottom: 20px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+    <select id="dutyLinkType" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%;">
+      <option value="">Select Requirement Type</option>
+      <option value="Learning Feedback Diary">Learning Feedback Diary</option>
+      <option value="Drug Study">Drug Study</option>
+      <option value="Nursing Care Plan">Nursing Care Plan</option>
+    </select>
+    <input id="dutyLinkUrl" placeholder="Paste document link here" style="padding: 10px; border:2px solid #e5e7eb; border-radius: 8px; width: 100%;" />
+    <select id="dutyLinkInstructor" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%;">
+      <option value="">Select Instructor</option>
+    </select>
+    <button class="primary" id="submitDutyLinkBtn" style="padding: 10px; width: 160px;">Submit Link</button>
+  </div>
+</div>
+
+<div style="margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+  <h4 style="margin-bottom: 12px; color: #333;">📋 My Submissions</h4>
+  <div id="studentFilesList" style="max-height: 400px; overflow-y: auto;">
+    <p style="text-align: center; color: #999; padding: 20px;">No files uploaded yet.</p>
+  </div>
+</div>
+</div>
+
+<!-- INSTRUCTOR VIEW -->
+<div id="instructorDutyView" class="duty-view" style="display: none;">
+<div style="background: #fef3c7; padding: 12px; border-radius: 8px; border-left: 4px solid #d97706; margin-bottom: 16px;">
+  <p style="font-size: 13px; color: #d97706; margin: 0;">👥 View all student submissions and download files</p>
+</div>
+
+<div style="margin-bottom: 16px; display: flex; gap: 8px;">
+  <input type="text" id="dutySearchStudent" placeholder="🔍 Search student by name..." style="flex: 1;" />
+  <select id="dutyFilterType" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+    <option value="">All File Types</option>
+    <option value="Learning Feedback Diary">Learning Feedback Diary</option>
+    <option value="Drug Study">Drug Study</option>
+    <option value="Nursing Care Plan">Nursing Care Plan</option>
+  </select>
+</div>
+
+<div id="instructorStudentFolders" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+  <p style="text-align: center; color: #999; padding: 20px; grid-column: 1/-1;">Loading student submissions...</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id="forum" class="section hidden">
+<div class="card">
+<h3>💬 Instructor Announcements</h3>
+<p style="font-size: 13px; color: #666; margin-bottom: 16px; padding: 10px; background: #f0f7ff; border-radius: 6px;">💡 Below are important announcements from your clinical instructors.</p>
+
+<h4 style="margin-top: 20px; margin-bottom: 10px;">📢 Announcements</h4>
+<div id="announcementsContainer" style="margin-bottom: 20px;">
+<p style="text-align: center; color: #999; padding: 20px;">No announcements yet. Check back for updates from instructors.</p>
+</div>
+
+<h4 style="margin-top: 20px; margin-bottom: 10px;">Public Forum</h4>
+<div style="margin-bottom: 16px;">
+  <textarea id="forumInput" placeholder="Write something..." style="width:100%; min-height:80px; padding: 10px; border:1px solid #d1d5db; border-radius:8px;"></textarea>
+  <button class="primary" onclick="addForumPost()" style="margin-top:8px;">💬 Post Message</button>
+</div>
+<div id="forumPosts" style="margin-bottom: 24px;"></div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="script.js"></script>
+
+</body>
+</html>
