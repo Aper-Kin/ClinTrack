@@ -1,5 +1,5 @@
 import { db, auth } from './firebase.js';
-import { collection, addDoc, getDocs, serverTimestamp, deleteDoc, doc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { collection, addDoc, getDocs, getDoc, serverTimestamp, deleteDoc, doc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 // Instructor Portal Script
 function logout() {
